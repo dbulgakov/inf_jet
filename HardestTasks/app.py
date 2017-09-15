@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, jsonify
 import HardestTasks.config as app_config
 from HardestTasks.yandex_manager import YandexManager
 
@@ -12,7 +12,7 @@ def get_tasks():
     if len(query_list) > 0:
         print('Queries: ', query_list)
         response = yandex_manager.perform_search(query_list)
-        return str(response)
+        return jsonify(response)
     else:
         return 'Pass queries'
 
