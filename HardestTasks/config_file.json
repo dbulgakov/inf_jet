@@ -1,0 +1,13 @@
+{
+  "yandex":{
+      "user_name":"dsbulgakov",
+      "api_key":"03.222636366:1195f423a35c432a3a9bba63bd7fe8d7"
+  },
+  "web-server":{
+      "host":"127.0.0.1",
+      "port":8080
+  },
+  "other":{
+      "api_thread_number":10
+  }
+}
