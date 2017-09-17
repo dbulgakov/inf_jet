@@ -3,6 +3,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
 import ssl
+from urllib.parse import quote
 import os
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -14,22 +15,24 @@ class YandexManager():
         self.domains = {}
         self.url = url
         self.executor = ThreadPoolExecutor(thread_number)
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
 
     @asyncio.coroutine
     def get_search_results(self, search_query):
-        search_url = self.url + search_query
-        # response = yield from self.loop.run_in_executor(self.executor, urllib.request.urlopen, search_url)
+        search_url = self.url + quote(search_query)
+        response = yield from self.loop.run_in_executor(self.executor, urllib.request.urlopen, search_url)
 
-        with open(os.getcwd() + '/1.xml', encoding="utf-8") as __json_data_file:
-            response_xml = self.parse_xml(__json_data_file)
+        # with open(os.getcwd() + '/1.xml', encoding="utf-8") as __json_data_file:
+        #     response_xml = self.parse_xml(__json_data_file)
+
+        response_xml = self.parse_xml(response.read())
 
         print(response_xml)
         self.count_domains(response_xml)
 
     def perform_search(self, queries_list):
         self.domains.clear()
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
         tasks = [asyncio.async(self.get_search_results(z)) for i, z in enumerate(queries_list)]
         self.loop.run_until_complete(asyncio.wait(tasks))
         self.loop.close()
@@ -56,5 +59,4 @@ class YandexManager():
         return extracted_domains
 
     def parse_xml(self, response_data):
-        # response_xml = BeautifulSoup(response_data.decode('utf-8'), "lxml")
-        return BeautifulSoup(response_data, "lxml")
+        return BeautifulSoup(response_data.decode('utf-8'), "lxml")
